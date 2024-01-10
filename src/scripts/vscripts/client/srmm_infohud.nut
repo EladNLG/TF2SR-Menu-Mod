@@ -26,24 +26,24 @@ struct SRMM_SettingInfo
 enum SRMM_settingDisplayPriority
 {
     // speedmod,
-    // TASmode,
+    practiceMode,
 }
 
 array<SRMM_ConVarInfo> SRMM_ConVarInfos = []
 array<SRMM_SettingInfo> SRMM_SettingInfos = []
 array<InfoDisplay> InfoDisplays = []
 array<InfoDisplay> CKF_infoDisplay = []
+float[2]& screenSize
 
 void function SRMM_InfoHUD_Init()
 {
     RegisterConVar("sv_cheats", 0)
     RegisterConVar("host_timescale", 1)
     RegisterConVar("player_respawnInputDebounceDuration", 0.5)
-
-    // in-game timer stuff
-    ClTimer_Init()
-    // RegisterSetting("TAS", SRMM_settings.TASmode, SRMM_settingDisplayPriority.TASmode)
+    RegisterSetting("Practice mode", SRMM_settings.practiceMode, SRMM_settingDisplayPriority.practiceMode)
     // RegisterSetting("speedmod", SRMM_settings.enableSpeedmod, SRMM_settingDisplayPriority.speedmod)
+
+    screenSize = GetScreenSize()
 
     for (int i = 0; i < displayLines; i++)
     {
@@ -177,7 +177,7 @@ void function SetInfoName(InfoDisplay display, string name)
 void function SetHudPos(InfoDisplay display, int line) {
     float showposOffset = 0.0
     bool isShowposOffsetActive = false
-    float aspectRatio = GetScreenSize()[0] / GetScreenSize()[1]
+    float aspectRatio = screenSize[0] / screenSize[1]
     
     if (GetConVarInt("cl_showpos") > 0) {
         isShowposOffsetActive = true
@@ -190,7 +190,7 @@ void function SetHudPos(InfoDisplay display, int line) {
     if (isShowposOffsetActive) showposOffset += 0.03
 
     // scale vertical position with screen size since cl_showpos scales badly
-    showposOffset *= 3 - GetScreenSize()[1] / 540
+    showposOffset *= 3 - screenSize[1] / 540
     RuiSetFloat2( display.infoTitle, "msgPos", <0.01, 0.04*line - 0.04 + aspectRatio/90 + showposOffset, 0.0> )
     // actual scaling of the position seems to be <1.0, 0.9>
 }
